@@ -5,17 +5,14 @@ import json
 import random
 import numpy as np
 
-METHOD_DIR = os.path.dirname(os.path.realpath(__file__))
-nebtools_dir = os.path.abspath(os.path.join(METHOD_DIR, '..', '..', '..', 'src', 'nebtools'))
-sys.path.append(nebtools_dir)
-
-import argsfromconfig as parsing
-import data.core_ as datacore
+import accnebtools.argsfromconfig as parsing
+import accnebtools.data.core_ as datacore
 import torch
 import accmp.acc as acc
 import accmp.transforms as accmptrns
 import accmp.preprocessing as preproc
 
+METHOD_DIR = os.path.dirname(os.path.realpath(__file__))
 
 def compute_embeddings(input_file, output_path, as_undirected, weighted, node_attributed, args, metadata_path=None):
     num_nodes, edges, weights, node_attributes, directed = datacore.read_graph_from_npz(

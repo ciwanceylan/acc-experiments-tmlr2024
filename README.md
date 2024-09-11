@@ -3,24 +3,12 @@
 This repository contains the graph experiments and benchmarking framework used for the paper "Full-Rank Unsupervised Node Embeddings for Directed
 Graphs via Message Aggregation" submitted to TLMR 2024. See usage instructions below.
 
-
-## Cloning without LFS files
-```bash
-GIT_LFS_SKIP_SMUDGE=1 git clone https://github.com/ciwanceylan/node-embedding-benchmarks.git
-```
-
-For windows 
-```cmd
-set GIT_LFS_SKIP_SMUDGE=1  
-git clone https://github.com/ciwanceylan/node-embedding-benchmarks.git
-```
-
 # Installation
 
 ### Install dependencies
 
 You first need to have a [conda](https://docs.anaconda.com/miniconda/) installed on your system.
-Possibly [mamba](https://mamba.readthedocs.io/en/latest/index.html) will also work, but this has not been tested.
+It is possible that [mamba](https://mamba.readthedocs.io/en/latest/index.html) will also work, but this has not been tested.
 
 Then you need to install the packages listed in [the requirements file](required_packages.txt) into an conda environment 
 named 'acc_neb_env'. You can do this conveniently by first using the provided [environment files](basic_environment_cu118.yml):

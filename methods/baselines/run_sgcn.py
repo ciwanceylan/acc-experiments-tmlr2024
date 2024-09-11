@@ -7,11 +7,9 @@ import numpy as np
 from typing import Optional
 
 METHOD_DIR = os.path.dirname(os.path.realpath(__file__))
-nebtools_dir = os.path.abspath(os.path.join(METHOD_DIR, '..', '..', '..', 'src', 'nebtools'))
-sys.path.append(nebtools_dir)
 
-import argsfromconfig as parsing
-import data.core_ as datacore
+import accnebtools.argsfromconfig as parsing
+import accnebtools.data.core_ as datacore
 
 import torch
 from torch import Tensor

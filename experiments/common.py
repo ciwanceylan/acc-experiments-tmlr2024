@@ -58,8 +58,8 @@ def get_common_parser():
 
     parser.add_argument("--resultdir", type=str, default="./local_results",
                         help="Path to file where results will be saved.")
-    parser.add_argument("--tempdir", type=str, default="./",
-                        help="Path to file where temporary files will be saved.")
+    parser.add_argument("--tempdir", type=str, default="/tmp",
+                        help="Path to directory where temporary files will be saved.")
     parser.add_argument("--timeout", type=int, default=3600,
                         help="When to timeout embedding methods.")
     parser.add_argument("--seed", type=int, default=1535523,
