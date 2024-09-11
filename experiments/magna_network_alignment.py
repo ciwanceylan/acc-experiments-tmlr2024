@@ -22,7 +22,8 @@ def load_alignment_graph(dataroot: str, noise_level: int):
     index_path = os.path.join(dataroot, "data_index.json")
     with open(index_path, 'r') as fp:
         dataset_info = json.load(fp)["magna"]
-    g1_graph = SimpleGraph.from_dataset_index(dataroot=dataroot, data_name='magna', as_undirected=True, as_unweighted=True)
+    g1_graph = SimpleGraph.from_dataset_index(dataroot=dataroot, data_name='magna', as_undirected=True,
+                                              as_unweighted=True)
     g2_path = os.path.join(dataset_info['datapath'], dataset_info['alignment_graphs_dir'], f'graph+{noise_level}e.npz')
     g2_graph = SimpleGraph.load(g2_path, as_canonical_undirected=True, add_symmetrical_edges=True, use_weights=False)
     merged_graph = dgraphs.union(g1_graph, g2_graph)
@@ -39,10 +40,7 @@ def get_evaluation(embeddings, align_obj, noise_p, alg, alg_output, pp_mode: str
     if embeddings is not None:
         if np.isfinite(embeddings).all():
             data.update(dc.asdict(alg_output))
-            pp_embeddings = utils.pp_embeddings_generator(embeddings,
-                                                          pp_modes=[pp_mode],
-                                                          alg_name=alg.spec.name,
-                                                          experiment_name="network_alignment")
+            pp_embeddings = utils.pp_embeddings_generator(embeddings, pp_modes=pp_mode.split("::"))
             start = time.time()
             align_results = alignment.eval_topk_sim(pp_embeddings, align_obj)
             alignment_duration = time.time() - start
@@ -65,7 +63,7 @@ def get_evaluation(embeddings, align_obj, noise_p, alg, alg_output, pp_mode: str
 
 
 def run_eval(dataroot: str, dataset_spec: DatasetSpec, alg_specs: Sequence[algutils.EmbeddingAlgSpec],
-             seed: int, resources: algutils.ComputeResources, noise_levels: Sequence[float],
+             seed: int, noise_levels: Sequence[int],
              pp_mode: str = 'all',
              tempdir: str = "./", results_path: str = None,
              timeout: int = 3600,
@@ -76,8 +74,7 @@ def run_eval(dataroot: str, dataset_spec: DatasetSpec, alg_specs: Sequence[algut
     all_results = []
 
     data_graph = SimpleGraph.from_dataset_spec(dataroot=dataroot, dataset_spec=dataset_spec)
-    algs = algutils.EmbeddingAlg.specs2algs(alg_specs=alg_specs, graph=data_graph, gc_mode='alg_compatible',
-                                            only_weighted=False, concat_node_attributes=False)
+    algs = algutils.EmbeddingAlg.specs2algs(alg_specs=alg_specs, graph=data_graph, gc_mode='alg_compatible')
 
     alg_filter = common.AlgFilter(max_strikes=0)
     for noise_level in tqdm.tqdm(noise_levels):
@@ -90,7 +87,6 @@ def run_eval(dataroot: str, dataset_spec: DatasetSpec, alg_specs: Sequence[algut
         emb_generator = algutils.generate_embeddings_from_subprocesses(
             graph,
             algs_to_run,
-            resources=resources,
             tempdir=tempdir,
             seed=seed,
             timeout=timeout
@@ -123,7 +119,7 @@ def main():
     experiment_name = f"{experiment_name}_{args.noise_level}"
     args.dataset = 'magna'
 
-    results_path, resources, _, args = common.setup_experiment(experiment_name, args)
+    results_path, _, args = common.setup_experiment(experiment_name, args)
     dataset_spec = DatasetSpec(data_name=args.dataset,
                                force_undirected=True,
                                force_unweighted=True,
@@ -135,7 +131,7 @@ def main():
     results = run_eval(dataroot=args.dataroot,
                        dataset_spec=dataset_spec, alg_specs=algs, tempdir=args.tempdir,
                        results_path=results_path, timeout=args.timeout,
-                       resources=resources, seed=args.seed, debug=args.debug,
+                       seed=args.seed, debug=args.debug,
                        noise_levels=noise_levels, pp_mode=args.pp_mode)
     pd.DataFrame(results).to_json(results_path, indent=2, orient="records")
 

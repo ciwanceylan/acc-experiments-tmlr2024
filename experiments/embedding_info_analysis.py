@@ -14,8 +14,7 @@ import common
 
 
 def run_eval(dataroot: str, dataset_spec: dgraphs.DatasetSpec, alg_specs: Sequence[algutils.EmbeddingAlgSpec], *,
-             seed: int, only_weighted: bool = False, resources: algutils.ComputeResources,
-             num_reps: int = 1, tempdir: str = "./", timeout: int = 3600, debug: bool = False, ):
+             seed: int, num_reps: int = 1, tempdir: str = "./", timeout: int = 3600, debug: bool = False, ):
     all_results = []
     singular_values = []
     seed_spawners = np.random.SeedSequence(seed)
@@ -23,17 +22,13 @@ def run_eval(dataroot: str, dataset_spec: dgraphs.DatasetSpec, alg_specs: Sequen
     alg_filter = common.AlgFilter(max_strikes=0)
 
     data_graph = dgraphs.SimpleGraph.from_dataset_spec(dataroot=dataroot, dataset_spec=dataset_spec)
-    # embeddings_per_hop = get_embeddings_per_hop(data_graph=data_graph, tempdir=tempdir, timeout=timeout,
-    #                                             seed=seed, resources=resources)
 
-    algs = algutils.EmbeddingAlg.specs2algs(alg_specs=alg_specs, graph=data_graph, gc_mode="alg_compatible",
-                                            only_weighted=only_weighted, concat_node_attributes=False)
+    algs = algutils.EmbeddingAlg.specs2algs(alg_specs=alg_specs, graph=data_graph, gc_mode="alg_compatible")
 
     for rep, alg_seed in zip(tqdm.trange(num_reps), seeds):
         algs_to_run = alg_filter.filter(algs)
         emb_generator = algutils.generate_embeddings_from_subprocesses(data_graph, algs_to_run,
                                                                        tempdir=tempdir,
-                                                                       resources=resources,
                                                                        seed=alg_seed,
                                                                        timeout=timeout)
         for alg, embeddings, alg_output in tqdm.tqdm(emb_generator, total=len(algs_to_run)):
@@ -67,14 +62,13 @@ def main():
     parser.add_argument("--num-reps", type=int, default=1, help="Number of times to extract embeddings.")
 
     args = parser.parse_args()
-    results_path, resources, dataset_spec, args = common.setup_experiment(experiment_name, args)
+    results_path, dataset_spec, args = common.setup_experiment(experiment_name, args)
 
     alg_specs = embalgsets.get_algs(args.methods, emb_dims=args.dims)
     results, singular_values, alg_filter = run_eval(dataroot=args.dataroot,
                                                     dataset_spec=dataset_spec, alg_specs=alg_specs, seed=args.seed,
-                                                    only_weighted=bool(args.only_weighted),
                                                     tempdir=args.tempdir, timeout=args.timeout, num_reps=args.num_reps,
-                                                    resources=resources, debug=args.debug)
+                                                    debug=args.debug)
     pd.DataFrame(results).to_json(results_path, indent=2, orient="records")
     with open(results_path[:-5] + "_singular_values.pkl", 'wb') as fp:
         pickle.dump(singular_values, fp)

@@ -38,6 +38,9 @@ pip install  dgl -f https://data.dgl.ai/wheels/torch-2.1/${CUDA}/repo.html
 pip install ogb==1.3.6
 ```
 
+To run [clustering_rank_deficiency_noise_demo.py](experiments/clustering_rank_deficiency_noise_demo.py) and 
+[squirrel_analysis.py](experiments/squirrel_analysis.py), you also need to install [matplotlib](https://matplotlib.org/), [seaborn](https://seaborn.pydata.org/) and [umap](https://umap-learn.readthedocs.io/en/latest/).
+
 
 ### Install framework
 To install the framework, while standing in the top repo directory, run
@@ -80,15 +83,15 @@ OSError: libcusparse.so.11: cannot open shared object file: No such file or dire
 ```
 Both of these can be fixed by updating the LD_LIBRARY_PATH
 ```bash
-export LD_LIBRARY_PATH=$CONDA_PREFIX/lib
+export LD_LIBRARY_PATH=/lib/x86_64-linux-gnu:$CONDA_PREFIX/lib
 ```
 If you are running the code via PyCharm, you might also need to set this path inside the IDE.
 
 
 In some setup, for example in Google Cloud, `conda` is not a valid command for interacting with conda from subprocesses
 from within python. I'm not sure why this is, but a fix is do the following replacement on Line...
-```python
-conda_command = f"conda run -n {alg.spec.env_name}".split()
-conda_command = f"__conda_exe run -n {alg.spec.env_name}".split()
+```diff
+- conda_command = f"conda run -n {alg.spec.env_name}".split()
++ conda_command = f"__conda_exe run -n {alg.spec.env_name}".split()
 ```
 

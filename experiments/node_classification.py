@@ -1,5 +1,5 @@
 import dataclasses as dc
-from typing import Sequence, Union
+from typing import Sequence
 import warnings
 import copy
 
@@ -13,7 +13,6 @@ import accnebtools.algs.preconfigs as embalgsets
 import accnebtools.algs.utils as algutils
 import accnebtools.experiments.classification as nodeclassification
 import accnebtools.experiments.pt_sgd_log_reg as sgd_classification
-import accnebtools.experiments.utils as utils
 import common
 
 
@@ -67,7 +66,7 @@ def get_evaluation(embeddings, node_labels, node_labels_type, alg, alg_output, p
         if np.isfinite(embeddings).all():
             data["kemb"] = embeddings.shape[1]
             for i, clf_model_name in enumerate(clf_models):
-                eval_results = evaluate_node_classification(embeddings=embeddings, pp_modes=[pp_mode],
+                eval_results = evaluate_node_classification(embeddings=embeddings, pp_modes=pp_mode.split("::"),
                                                             alg=alg, labels=node_labels,
                                                             node_labels_type=node_labels_type,
                                                             seed=alg_seed, model_name=clf_model_name,
@@ -88,9 +87,8 @@ def get_evaluation(embeddings, node_labels, node_labels_type, alg, alg_output, p
 
 
 def run_eval(dataroot: str, dataset_spec: dgraphs.DatasetSpec, alg_specs: Sequence[algutils.EmbeddingAlgSpec], *,
-             seed: int, only_weighted: bool = False, resources: algutils.ComputeResources,
-             num_reps: int = 1, pp_mode: str = 'all', tempdir: str = "./", timeout: int = 3600, debug: bool = False,
-             classifier: str, stratified: bool):
+             seed: int, num_reps: int = 1, pp_mode: str = 'all', tempdir: str = "./", timeout: int = 3600,
+             debug: bool = False, classifier: str, stratified: bool):
     all_results = []
     all_fi_results = dict()
 
@@ -102,15 +100,12 @@ def run_eval(dataroot: str, dataset_spec: dgraphs.DatasetSpec, alg_specs: Sequen
     node_labels, node_labels_type = nodeclassification.read_node_labels(dataroot=dataroot,
                                                                         dataset=dataset_spec.data_name)
 
-    algs = algutils.EmbeddingAlg.specs2algs(alg_specs=alg_specs, graph=data_graph, gc_mode="alg_compatible",
-                                            only_weighted=only_weighted,
-                                            concat_node_attributes=data_graph.is_node_attributed)
+    algs = algutils.EmbeddingAlg.specs2algs(alg_specs=alg_specs, graph=data_graph, gc_mode="alg_compatible")
 
     for rep, alg_seed in zip(tqdm.trange(num_reps), seeds):
         algs_to_run = alg_filter.filter(algs)
         emb_generator = algutils.generate_embeddings_from_subprocesses(data_graph, algs_to_run,
                                                                        tempdir=tempdir,
-                                                                       resources=resources,
                                                                        seed=alg_seed,
                                                                        timeout=timeout)
         for alg, embeddings, alg_output in tqdm.tqdm(emb_generator, total=len(algs_to_run)):
@@ -133,15 +128,13 @@ def main():
     parser.add_argument("--stratified", action='store_true', help="Use stratified splits.")
 
     args = parser.parse_args()
-    results_path, resources, dataset_spec, args = common.setup_experiment(experiment_name, args)
+    results_path, dataset_spec, args = common.setup_experiment(experiment_name, args)
 
     alg_specs = embalgsets.get_algs(args.methods, emb_dims=args.dims)
     results, alg_filter, all_fi_results = run_eval(dataroot=args.dataroot,
                                                    dataset_spec=dataset_spec, alg_specs=alg_specs, seed=args.seed,
-                                                   only_weighted=bool(args.only_weighted),
                                                    tempdir=args.tempdir, timeout=args.timeout, num_reps=args.num_reps,
-                                                   pp_mode=args.pp_mode,
-                                                   resources=resources, debug=args.debug,
+                                                   pp_mode=args.pp_mode, debug=args.debug,
                                                    classifier=args.clf, stratified=args.stratified)
     pd.DataFrame(results).to_json(results_path, indent=2, orient="records")
     if len(all_fi_results) > 0:

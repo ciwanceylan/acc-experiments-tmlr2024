@@ -86,10 +86,7 @@ def get_align_results_and_save(results_path, embeddings: np.ndarray, align_obj, 
     np.savez(os.path.join(folder, f"{alg.spec.name}_raw_embeddings.npz"),
              embeddings=embeddings
              )
-    pp_embeddings = utils.pp_embeddings_generator(embeddings,
-                                                  pp_modes=[pp_mode],
-                                                  alg_name=alg.spec.name,
-                                                  experiment_name="network_alignment")
+    pp_embeddings = utils.pp_embeddings_generator(embeddings, pp_modes=pp_mode.split("::"))
 
     all_results = {}
     for pp_mode, X in pp_embeddings:
@@ -115,7 +112,7 @@ def get_align_results_and_save(results_path, embeddings: np.ndarray, align_obj, 
 
 
 def run_eval(dataroot, dataset_spec: DatasetSpec, alg_specs: Sequence[algutils.EmbeddingAlgSpec],
-             seed: int, resources: algutils.ComputeResources, noise_p: float,
+             seed: int, noise_p: float,
              pp_mode: str = 'all', tempdir: str = "./", results_path: str = None, timeout: int = 3600,
              debug: bool = False):
     results_dir = os.path.dirname(results_path)
@@ -133,9 +130,7 @@ def run_eval(dataroot, dataset_spec: DatasetSpec, alg_specs: Sequence[algutils.E
             p=noise_p,
             rng=rng
         )
-    algs = algutils.EmbeddingAlg.specs2algs(alg_specs=alg_specs, graph=graph, gc_mode='alg_filter',
-                                            only_weighted=graph.is_weighted,
-                                            concat_node_attributes=graph.is_node_attributed)
+    algs = algutils.EmbeddingAlg.specs2algs(alg_specs=alg_specs, graph=graph, gc_mode='alg_compatible')
 
     alg_filter = common.AlgFilter(max_strikes=2)
     algs_to_run = alg_filter.filter(algs)
@@ -149,7 +144,6 @@ def run_eval(dataroot, dataset_spec: DatasetSpec, alg_specs: Sequence[algutils.E
     emb_generator = algutils.generate_embeddings_from_subprocesses(
         graph,
         algs_to_run,
-        resources=resources,
         tempdir=tempdir,
         seed=seed,
         timeout=timeout
@@ -180,12 +174,12 @@ def main():
 
     experiment_name = f"{experiment_name}_{args.noise_p}"
 
-    results_path, resources, dataset_spec, args = common.setup_experiment(experiment_name, args)
+    results_path, dataset_spec, args = common.setup_experiment(experiment_name, args)
     algs = embalgsets.get_algs(args.methods, emb_dims=args.dims)
 
     results = run_eval(dataroot=args.dataroot, dataset_spec=dataset_spec, alg_specs=algs,
                        tempdir=args.tempdir, results_path=results_path, timeout=args.timeout,
-                       resources=resources, seed=args.seed, debug=args.debug,
+                       seed=args.seed, debug=args.debug,
                        noise_p=args.noise_p, pp_mode=args.pp_mode)
     pd.DataFrame(results).to_json(results_path, lines=True, orient="records")
 

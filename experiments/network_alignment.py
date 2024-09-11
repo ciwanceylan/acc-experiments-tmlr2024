@@ -37,10 +37,7 @@ def get_evaluation(embeddings, align_obj, noise_p, noise_p_actual, alg_name, alg
         if np.isfinite(embeddings).all():
             data.update(dc.asdict(alg_output))
             del data['feature_descriptions']
-            pp_embeddings = utils.pp_embeddings_generator(embeddings,
-                                                          pp_modes=pp_modes.split("::"),
-                                                          alg_name=alg_name,
-                                                          experiment_name="network_alignment")
+            pp_embeddings = utils.pp_embeddings_generator(embeddings, pp_modes=pp_modes.split("::"))
             start = time.time()
             align_results = alignment.eval_topk_sim(pp_embeddings, align_obj)
             alignment_duration = time.time() - start
@@ -63,13 +60,11 @@ def get_evaluation(embeddings, align_obj, noise_p, noise_p_actual, alg_name, alg
 
 
 def run_eval(dataroot: str, dataset_spec: DatasetSpec, alg_specs: Sequence[algutils.EmbeddingAlgSpec],
-             seed: int, resources: algutils.ComputeResources, noise_levels: Sequence[float],
+             seed: int, noise_levels: Sequence[float],
              num_reps: int = 5, pp_mode: str = 'all',
              tempdir: str = "./", results_path: str = None,
              timeout: int = 3600,
              debug: bool = False):
-    # num_reps = 5
-    # noise_levels = [0, 0.01, 0.02, 0.03, 0.04, 0.05]
     if debug:
         num_reps = 1
         noise_levels = [0.01]
@@ -79,9 +74,7 @@ def run_eval(dataroot: str, dataset_spec: DatasetSpec, alg_specs: Sequence[algut
     seed_spawners = np.random.SeedSequence(seed).spawn(len(noise_levels))
 
     data_graph = SimpleGraph.from_dataset_spec(dataroot=dataroot, dataset_spec=dataset_spec)
-    algs = algutils.EmbeddingAlg.specs2algs(alg_specs=alg_specs, graph=data_graph, gc_mode='alg_compatible',
-                                            only_weighted=data_graph.is_weighted,
-                                            concat_node_attributes=data_graph.is_node_attributed)
+    algs = algutils.EmbeddingAlg.specs2algs(alg_specs=alg_specs, graph=data_graph, gc_mode='alg_compatible')
 
     alg_filter = common.AlgFilter(max_strikes=0)
     for noise_p, ss in zip(tqdm.tqdm(noise_levels), seed_spawners):
@@ -97,7 +90,6 @@ def run_eval(dataroot: str, dataset_spec: DatasetSpec, alg_specs: Sequence[algut
             emb_generator = algutils.generate_embeddings_from_subprocesses(
                 graph,
                 algs_to_run,
-                resources=resources,
                 tempdir=tempdir,
                 seed=algs_seed,
                 timeout=timeout
@@ -139,13 +131,13 @@ def main():
 
     experiment_name = f"{experiment_name}_{args.noise_p}"
 
-    results_path, resources, dataset_spec, args = common.setup_experiment(experiment_name, args)
+    results_path, dataset_spec, args = common.setup_experiment(experiment_name, args)
     algs = embalgsets.get_algs(args.methods, emb_dims=args.dims)
 
     results = run_eval(dataroot=args.dataroot,
                        dataset_spec=dataset_spec, alg_specs=algs,
                        tempdir=args.tempdir, results_path=results_path, timeout=args.timeout,
-                       resources=resources, seed=args.seed, debug=args.debug,
+                       seed=args.seed, debug=args.debug,
                        noise_levels=noise_levels, num_reps=args.num_reps, pp_mode=args.pp_mode)
     pd.DataFrame(results).to_json(results_path, indent=2, orient="records")
 

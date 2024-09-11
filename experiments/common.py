@@ -53,8 +53,6 @@ def get_common_parser():
     parser.add_argument("--weighted", type=int, default=0, help="Use weights")
     parser.add_argument("--undirected", type=int, default=0, help="Remove directions.")
     parser.add_argument("--node-attributed", type=int, default=0, help="Use node attributes if available.")
-    parser.add_argument("--only_weighted", type=int, default=0, help="Only use weighted graph instead of both weighted "
-                                                                     "and unweighted.")
     parser.add_argument("--dims", type=int, default=None, help="Embedding dimensionality.")
     parser.add_argument("--pp-mode", type=str, default="all", help="Which preprocessing to use.")
 
@@ -66,25 +64,11 @@ def get_common_parser():
                         help="When to timeout embedding methods.")
     parser.add_argument("--seed", type=int, default=1535523,
                         help="The random seed to use.")
-    parser.add_argument("--cpu-workers", type=int, default=4,
-                        help="Number of cpu workers available")
-    parser.add_argument("--cpu-memory", type=int, default=8,
-                        help="RAM available for cpu workers")
-    parser.add_argument("--gpu-workers", type=int, default=0,
-                        help="Number of GPU workers available")
-    parser.add_argument("--gpu-memory", type=int, default=8,
-                        help="GPU RAM available per GPU")
     parser.add_argument("--debug", action="store_true", help="Use debug settings.")
     return parser
 
 
-def setup_experiment(experiment_name, args) -> Tuple[str, algutils.ComputeResources, DatasetSpec, argparse.Namespace]:
-    resources = algutils.ComputeResources(
-        cpu_workers=args.cpu_workers,
-        cpu_memory=args.cpu_memory,
-        gpu_workers=args.gpu_workers,
-        gpu_memory=args.gpu_memory
-    )
+def setup_experiment(experiment_name, args) -> Tuple[str, DatasetSpec, argparse.Namespace]:
     if args.debug:
         args.resultdir = "./debug"
         args.tempdir = "./debug"
@@ -92,8 +76,6 @@ def setup_experiment(experiment_name, args) -> Tuple[str, algutils.ComputeResour
 
     os.makedirs(args.resultdir, exist_ok=True)
     os.makedirs(args.tempdir, exist_ok=True)
-
-    # method_names = ["defaults"] if args.methods is None else args.methods
 
     dataset_spec = DatasetSpec(data_name=args.dataset,
                                force_undirected=bool(args.undirected),
@@ -108,12 +90,10 @@ def setup_experiment(experiment_name, args) -> Tuple[str, algutils.ComputeResour
             f"{'_undir' if args.undirected else ''}" +
             f"{'_weighted' if args.weighted else ''}" +
             f"{'_node_attributed' if hasattr(args, 'node_attributed') and args.node_attributed else ''}" +
-            f"{'_edge_attributed' if hasattr(args, 'edge_attributed') and args.edge_attributed else ''}" +
-            f"{'_dynamic' if hasattr(args, 'dynamic') and args.dynamic else ''}" +
             ".json"
     )
     results_path = make_result_folder(args.resultdir, experiment_name, args.dataset, methods_str, file_name)
     with open(os.path.join(os.path.dirname(results_path), "run_inputs.json"), 'w') as fp:
         json.dump(vars(args), fp, indent=2)
 
-    return results_path, resources, dataset_spec, args
+    return results_path, dataset_spec, args
