@@ -23,11 +23,11 @@ You first need to have a [conda](https://docs.anaconda.com/miniconda/) installed
 Possibly [mamba](https://mamba.readthedocs.io/en/latest/index.html) will also work, but this has not been tested.
 
 Then you need to install the packages listed in [the requirements file](required_packages.txt) into an conda environment 
-named 'acc_neb_env'.
-The most convenient way to do this, and to use the same package versions as in our paper, is to first use the provided [environment file](basic_environment.yml):
+named 'acc_neb_env'. You can do this conveniently by first using the provided [environment files](basic_environment_cu118.yml):
 ```commandline
-conda env create --file basic_environment.yml
+conda env create --file basic_environment_${CUDA}.yml
 ```
+where `${CUDA}` is either `cu118` for GPU, or `cpu` for only CPU support.
 Then, activate the environment, and install the following dependencies via pip:
 ```commandline
 conda activate acc_neb_env
@@ -35,8 +35,9 @@ pip install torch==2.1.2 --index-url https://download.pytorch.org/whl/${CUDA}
 pip install torch_geometric
 pip install pyg_lib==0.3.1 torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.1.0+${CUDA}.html
 pip install  dgl -f https://data.dgl.ai/wheels/torch-2.1/${CUDA}/repo.html
+pip install ogb==1.3.6
 ```
-where `${CUDA}` is either `cu118` for GPU, or `cpu` for only CPU support.
+
 
 ### Install framework
 To install the framework, while standing in the top repo directory, run
@@ -52,20 +53,37 @@ pip install -e <path/to/ACC-repo>
 ```
 
 
-### Troubleshooting
+# Datasets
 
-If you see an error along the lines of
+All the graph alignment datasets are available under `data/inrepo`. To index these datasets and to download the node 
+classification datasets, please run
+```commandline
+python index_and_download_datasets.py
+```
+
+Snap Patents has to be downloaded manually from here [LINK](https://github.com/CUAI/Non-Homophily-Large-Scale?tab=readme-ov-file#dataset-preparation).
+Once this is done, you can prepare and index it by providing the path to the downloaded .mat file to the dataset preparation script:
+```commandline
+python index_and_download_datasets.py --snap-patents-path <path/to/snap_patents.mat>
+```
+
+
+# Troubleshooting
+
+You may encounder errors along the lines of
 ```
 ImportError: /usr/lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.29' not found.
 ```
-
-Both pytorch geometric and DGL may raise errors related to a bad LD_LIBRARY_PATH.
-
-
-To fix these, try
+or
+```commandline
+OSError: libcusparse.so.11: cannot open shared object file: No such file or directory.
+```
+Both of these can be fixed by updating the LD_LIBRARY_PATH
 ```bash
 export LD_LIBRARY_PATH=$CONDA_PREFIX/lib
 ```
+If you are running the code via PyCharm, you might also need to set this path inside the IDE.
+
 
 In some setup, for example in Google Cloud, `conda` is not a valid command for interacting with conda from subprocesses
 from within python. I'm not sure why this is, but a fix is do the following replacement on Line...
