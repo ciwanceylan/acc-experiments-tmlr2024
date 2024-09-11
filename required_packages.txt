@@ -8,6 +8,7 @@ pyyaml
 tqdm
 numba
 networkx
+cudatoolkit
 tbb (Required for parallelization with numba)
 icc_rt (Optional, improves numba speed. Provided via the 'numba' channel using conda)
 
