@@ -60,8 +60,8 @@ def compute_embeddings(input_file, output_path, as_undirected, weighted, node_at
         max_dim=args.dimensions,
         return_us=args.return_us,
         use_rsvd=args.use_rsvd,
-        sv_prune=args.sv_thresholding,
-        sv_tol=args.theta,
+        sv_thresholding=args.sv_thresholding,
+        theta=args.theta,
         normalized_weights=True,
     )
 

@@ -14,6 +14,7 @@ import accmp.preprocessing as preproc
 
 METHOD_DIR = os.path.dirname(os.path.realpath(__file__))
 
+
 def compute_embeddings(input_file, output_path, as_undirected, weighted, node_attributed, args, metadata_path=None):
     num_nodes, edges, weights, node_attributes, directed = datacore.read_graph_from_npz(
         input_file, as_canonical_undirected=as_undirected, add_symmetrical_edges=as_undirected, remove_self_loops=True)
@@ -57,8 +58,8 @@ def compute_embeddings(input_file, output_path, as_undirected, weighted, node_at
         min_add_dim=args.min_add_dim,
         max_dim=args.dimensions,
         return_us=args.return_us,
-        sv_prune=args.sv_thresholding,
-        sv_tol=args.theta,
+        sv_thresholding=args.sv_thresholding,
+        theta=args.theta,
         use_rsvd=args.use_rsvd,
     )
 
