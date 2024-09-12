@@ -180,3 +180,24 @@ def get_pp_pipeline(model: Union[Classifier, MultiOutputClassifier], pp_mode: st
     else:
         raise ValueError(f"Unknown pp_mode '{pp_mode}'")
     return pipeline
+
+
+def pp_and_evaluate(embeddings: np.ndarray,
+                    model: Union[Classifier, MultiOutputClassifier],
+                    pp_modes: Sequence[str],
+                    evaluator: utils.Evaluator,
+                    alg_name: str,
+                    y_train: pd.Series, y_test: pd.Series,
+                    scores_name: str
+                    ):
+    scores = []
+
+    pp_model_generator = pp_pipeline_generator(model=model, pp_modes=pp_modes)
+    X_train, X_test = embeddings[y_train.index, :], embeddings[y_test.index, :]
+    for pp_mode, model_pipeline in pp_model_generator:
+        scores += evaluator.evaluate(
+            X_train=X_train, X_test=X_test, y_train=y_train, y_test=y_test, model=model_pipeline,
+            scores_name=scores_name + f"::{pp_mode}"
+        )
+
+    return scores

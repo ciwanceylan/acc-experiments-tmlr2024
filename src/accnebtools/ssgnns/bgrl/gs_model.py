@@ -1,12 +1,10 @@
-from typing import Final, Tuple, Union, Optional, List
+from typing import Final, Tuple, Union, Optional
 
 import torch_geometric as pyg
-from torch import Tensor
 from torch_geometric.nn.conv import (
     MessagePassing,
     SAGEConv,
 )
-from torch_geometric.typing import Adj, OptTensor
 
 
 class GraphSAGE(pyg.nn.models.basic_gnn.BasicGNN):

@@ -10,7 +10,7 @@ import torch
 import torch.nn as nn
 
 import accnebtools.experiments.classification as nodeclassification
-from accnebtools.experiments.classification import MulticlassClassificationScores, Classifier, Pipeline
+from accnebtools.experiments.classification import MulticlassClassificationScores, Pipeline
 import accnebtools.experiments.utils as utils
 
 TArray = Union[torch.Tensor, np.ndarray]

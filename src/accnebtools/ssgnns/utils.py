@@ -78,19 +78,11 @@ class EvalClassificationCallback(TestEvalCallback):
             self.y_test = labels[y_train_test[1]]
         n_splits = int(1. / test_ratio)
 
-        if node_labels_type == "multilabel":
-            self.evaluator = nodeclassification.MultiLabelEvaluator(random_state=seed, with_train_eval=False,
-                                                                    n_repeats=3, n_splits=n_splits,
-                                                                    train_ratio=1. - test_ratio)
-        elif node_labels_type == "multiclass":
+        if node_labels_type == "multiclass":
 
             self.evaluator = nodeclassification.MultiClassEvaluator(random_state=seed, with_train_eval=False,
                                                                     n_repeats=3, n_splits=n_splits,
                                                                     train_ratio=1. - test_ratio)
-        elif node_labels_type == "binary":
-            self.evaluator = nodeclassification.BinaryEvaluator(random_state=seed, with_train_eval=False,
-                                                                n_repeats=3, n_splits=n_splits,
-                                                                train_ratio=1. - test_ratio)
         else:
             raise NotImplementedError(f"Evaluation not implemented for '{node_labels_type}'.")
 
@@ -180,9 +172,7 @@ class EvalNetworkAlignmentCallback(TestEvalCallback):
     def evaluate_alignment(self, embeddings: torch.Tensor, align_obj) -> List[Dict]:
         results = []
         pp_embeddings = exprutils.pp_embeddings_generator(embeddings.cpu().numpy(),
-                                                          pp_modes=self.pp_modes,
-                                                          alg_name="ssgnn",
-                                                          experiment_name="network_alignment")
+                                                          pp_modes=self.pp_modes)
         start = time.perf_counter()
         align_results = alignment.eval_topk_sim(pp_embeddings, align_obj)
         duration = time.perf_counter() - start
