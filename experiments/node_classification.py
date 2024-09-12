@@ -22,12 +22,12 @@ def evaluate_node_classification(embeddings: np.ndarray, pp_modes, alg: algutils
     n_reps = 3 if embeddings.shape[0] < 1e6 else 1
     if node_labels_type == "multiclass" and model_name == "log_reg_sgd":
 
-        evaluators = [sgd_classification.PTSGDMultiClassEvaluator(random_state=seed, with_train_eval=True,
+        evaluators = [sgd_classification.PTSGDMultiClassEvaluator(random_state=seed, with_train_eval=False,
                                                                   n_repeats=n_reps, n_splits=5, train_ratio=None,
                                                                   stratified=stratified)]
     elif node_labels_type == "multiclass":
 
-        evaluators = [nodeclassification.MultiClassEvaluator(random_state=seed, with_train_eval=True,
+        evaluators = [nodeclassification.MultiClassEvaluator(random_state=seed, with_train_eval=False,
                                                              n_repeats=n_reps, n_splits=5, train_ratio=None,
                                                              stratified=stratified)]
     else:

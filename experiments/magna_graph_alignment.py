@@ -105,10 +105,9 @@ def run_eval(dataroot: str, dataset_spec: DatasetSpec, alg_specs: Sequence[algut
 
 
 def main():
-    experiment_name = "magna_network_alignment"
+    experiment_name = "magna_graph_alignment"
     parser = common.get_common_parser()
-    parser.add_argument("--noise-level", type=str, default="full",
-                        help="Amount of edge noise to use.")
+    parser.add_argument("--noise-level", type=str, default="full", help="Amount of edge noise to use.")
     args = parser.parse_args()
 
     if args.noise_level == "full":

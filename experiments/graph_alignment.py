@@ -108,7 +108,7 @@ def run_eval(dataroot: str, dataset_spec: DatasetSpec, alg_specs: Sequence[algut
 
 
 def main():
-    experiment_name = "network_alignment"
+    experiment_name = "graph_alignment"
     parser = common.get_common_parser()
     parser.add_argument("--noisemodel", type=str, help="Which method to add noise to the graphs",
                         default="remove")

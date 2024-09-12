@@ -16,8 +16,8 @@ import accnebtools.experiments.alignment as alignment
 import accnebtools.experiments.utils as utils
 import common
 
-from network_alignment import make_alignment_graph
-from magna_network_alignment import load_alignment_graph
+from graph_alignment import make_alignment_graph
+from magna_graph_alignment import load_alignment_graph
 
 
 def separate_merged_graphs(g: dgraphs.SimpleGraph, align_obj: alignment.AlignedGraphs):
@@ -164,7 +164,7 @@ def run_eval(dataroot, dataset_spec: DatasetSpec, alg_specs: Sequence[algutils.E
 
 
 def main():
-    experiment_name = "na_node_analysis"
+    experiment_name = "ga_node_analysis"
     parser = common.get_common_parser()
     parser.add_argument("--noise-p", type=float, default=0.15,
                         help="Amount of edge noise to use.")
