@@ -8,7 +8,7 @@ pyyaml
 tqdm
 numba
 networkx
-cudatoolkit
+cudatoolkit (If using GPU)
 tbb (Required for parallelization with numba)
 icc_rt (Optional, improves numba speed. Provided via the 'numba' channel using conda)
 
@@ -24,3 +24,4 @@ dgl
 # Optional for plotting
 matplotlib
 seaborn
+umap
