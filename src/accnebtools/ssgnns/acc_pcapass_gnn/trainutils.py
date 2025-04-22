@@ -4,8 +4,8 @@ from typing import Sequence, Literal, Tuple, Optional
 import numpy as np
 import torch
 
-import nebtools.data.graph as dgraph
-from nebtools.ssgnns.utils import SSGNNTrainer, get_features
+import accnebtools.data.graph as dgraph
+from accnebtools.ssgnns.utils import SSGNNTrainer, get_features
 
 from .GraphMAE2.models.edcoder import PreModel
 
