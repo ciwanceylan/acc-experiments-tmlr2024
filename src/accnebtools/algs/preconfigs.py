@@ -40,6 +40,8 @@ def _get_algs(method_set: str, emb_dim: int = None, num_epochs: int = None):
         methods = detailed_ga_analysis12(max_dim=emb_dim)
     elif method_set == "acc_pcapass_sv_spectra":
         methods = acc_pcapass_sv_spectra(max_dim=emb_dim)
+    elif method_set == "acc_pcapass_gnn_sv_spectra":
+        methods = acc_pcapass_gnn_sv_spectra(max_dim=emb_dim, num_epochs=num_epochs)
     else:
         methods = get_alg_by_name({method_set}, emb_dim=emb_dim, num_epochs=num_epochs)
         if len(methods) == 0:
@@ -148,6 +150,25 @@ def acc_pcapass_sv_spectra(max_dim: int):
                 dimensions=max_dim,
                 sv_thresholding='none',
                 theta=0.0
+            )
+        )
+    return methods
+
+def acc_pcapass_gnn_sv_spectra(max_dim: int, num_epochs: int):
+    methods = []
+    for steps in [0, 1, 2, 3, 4, 6, 8, 10]:
+        methods.append(
+            embalgs.PcapassgnnAlg(
+                dimensions=max_dim,
+                num_layers=steps,
+                num_epochs=num_epochs
+            )
+        )
+        methods.append(
+            embalgs.AccgnnAlg(
+                dimensions=max_dim,
+                num_layers=steps,
+                num_epochs=num_epochs
             )
         )
     return methods
