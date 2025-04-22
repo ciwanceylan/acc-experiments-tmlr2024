@@ -175,7 +175,7 @@ def main():
     experiment_name = f"{experiment_name}_{args.noise_p}"
 
     results_path, dataset_spec, args = common.setup_experiment(experiment_name, args)
-    algs = embalgsets.get_algs(args.methods, emb_dims=args.dims)
+    algs = embalgsets.get_algs(args.methods, emb_dims=args.dims, num_epochs=args.num_epochs)
 
     results = run_eval(dataroot=args.dataroot, dataset_spec=dataset_spec, alg_specs=algs,
                        tempdir=args.tempdir, results_path=results_path, timeout=args.timeout,

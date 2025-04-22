@@ -64,7 +64,7 @@ def main():
     args = parser.parse_args()
     results_path, dataset_spec, args = common.setup_experiment(experiment_name, args)
 
-    alg_specs = embalgsets.get_algs(args.methods, emb_dims=args.dims)
+    alg_specs = embalgsets.get_algs(args.methods, emb_dims=args.dims, num_epochs=args.num_epochs)
     results, singular_values, alg_filter = run_eval(dataroot=args.dataroot,
                                                     dataset_spec=dataset_spec, alg_specs=alg_specs, seed=args.seed,
                                                     tempdir=args.tempdir, timeout=args.timeout, num_reps=args.num_reps,

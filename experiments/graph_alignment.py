@@ -112,10 +112,8 @@ def main():
     parser = common.get_common_parser()
     parser.add_argument("--noisemodel", type=str, help="Which method to add noise to the graphs",
                         default="remove")
-    parser.add_argument("--noise-p", type=str, default="full",
-                        help="Amount of edge noise to use.")
-    parser.add_argument("--num-reps", type=int, default=5,
-                        help="Num repeats")
+    parser.add_argument("--noise-p", type=str, default="full", help="Amount of edge noise to use.")
+    parser.add_argument("--num-reps", type=int, default=5, help="Num repeats")
     args = parser.parse_args()
 
     if args.noise_p == "low":
@@ -132,7 +130,7 @@ def main():
     experiment_name = f"{experiment_name}_{args.noise_p}"
 
     results_path, dataset_spec, args = common.setup_experiment(experiment_name, args)
-    algs = embalgsets.get_algs(args.methods, emb_dims=args.dims)
+    algs = embalgsets.get_algs(args.methods, emb_dims=args.dims, num_epochs=args.num_epochs)
 
     results = run_eval(dataroot=args.dataroot,
                        dataset_spec=dataset_spec, alg_specs=algs,

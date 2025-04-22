@@ -125,7 +125,7 @@ def main():
                                rm_node_attributes=True,
                                with_self_loops=False
                                )
-    algs = embalgsets.get_algs(args.methods, emb_dims=args.dims)
+    algs = embalgsets.get_algs(args.methods, emb_dims=args.dims, num_epochs=args.num_epochs)
 
     results = run_eval(dataroot=args.dataroot,
                        dataset_spec=dataset_spec, alg_specs=algs, tempdir=args.tempdir,

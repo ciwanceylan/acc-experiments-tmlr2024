@@ -55,6 +55,8 @@ def get_common_parser():
     parser.add_argument("--node-attributed", type=int, default=0, help="Use node attributes if available.")
     parser.add_argument("--dims", type=int, default=None, help="Embedding dimensionality.")
     parser.add_argument("--pp-mode", type=str, default="all", help="Which preprocessing to use.")
+    parser.add_argument("--num-epochs", type=int, default=None,
+                        help="Set number of training epochs of SSGNNs explicitly. Default: Use algorithm default.")
 
     parser.add_argument("--resultdir", type=str, default="./local_results",
                         help="Path to file where results will be saved.")
