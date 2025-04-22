@@ -103,3 +103,69 @@ methods:
         default: False
         type: bool
         description: Use randomized SVD instead of full SVD
+  accgnn:
+    modes:
+      directed: True
+      weighted: False
+      node_attributed: True
+    hyperparameters:
+      num_epochs:
+        default: 20
+        type: int
+        description: Number of training epochs
+      num_layers:
+        default: 6
+        type: int
+        description: Number of layers.
+      dimensions:
+        default: 512
+        type: int
+        description: Embedding dimension.
+      add_degree:
+        default: True
+        type: bool
+        description: Use the node degree features
+      add_lcc:
+        default: True
+        type: bool
+        description: Use the local clustering coefficient features
+      standardize:
+        default: True
+        type: bool
+        description: Standardize the input attributes.
+      use_cpu:
+        default: False
+        type: bool
+        description: Force use CPU.
+      lr:
+        default: 1e-3
+        type: float
+        description: Learning rate.
+      wd:
+        default: 1e-4
+        type: float
+        description: Weight decay.
+      mask_rate:
+        default: 0.5
+        type: float
+        description: Mask ratio.
+      replace_rate:
+        default: 0.05
+        type: float
+        description: Replacement rate.
+      alpha_l:
+        default: 3
+        type: int
+        description: Loss exponent parameter.
+      lam:
+        default: 1.0
+        type: float
+        description: Loss weighting parameter.
+      encoder:
+        default: 'acc'
+        type: str
+        description: Which encoder to use.
+    alt_versions:
+      pcapassgnn:
+        encoder:
+          default: 'pcapass'

@@ -62,6 +62,58 @@ class PcapassAlg(EmbeddingAlgSpec):
 
 
 @dc.dataclass(frozen=True)
+class AccgnnAlg(EmbeddingAlgSpec):
+    graph_support: AlgGraphSupport = AlgGraphSupport(
+        directed=True,
+        weighted=False,
+        node_attributed=True,
+    )
+    num_epochs: int = 20  # Number of training epochs
+    num_layers: int = 6  # Number of layers.
+    dimensions: int = 512  # Embedding dimension.
+    add_degree: bool = True  # Use the node degree features
+    add_lcc: bool = True  # Use the local clustering coefficient features
+    standardize: bool = True  # Standardize the input attributes.
+    use_cpu: bool = False  # Force use CPU.
+    lr: float = 1e-3  # Learning rate.
+    wd: float = 1e-4  # Weight decay.
+    mask_rate: float = 0.5  # Mask ratio.
+    replace_rate: float = 0.05  # Replacement rate.
+    alpha_l: int = 3  # Loss exponent parameter.
+    lam: float = 1.0  # Loss weighting parameter.
+    encoder: str = 'acc'  # Which encoder to use.
+    name: str = 'accgnn'
+    path: str = 'methods/acc_and_pcapass/run_accgnn.py'
+    env_name: str = 'acc_neb_env'
+
+
+@dc.dataclass(frozen=True)
+class PcapassgnnAlg(EmbeddingAlgSpec):
+    graph_support: AlgGraphSupport = AlgGraphSupport(
+        directed=True,
+        weighted=False,
+        node_attributed=True,
+    )
+    num_epochs: int = 20  # Number of training epochs
+    num_layers: int = 6  # Number of layers.
+    dimensions: int = 512  # Embedding dimension.
+    add_degree: bool = True  # Use the node degree features
+    add_lcc: bool = True  # Use the local clustering coefficient features
+    standardize: bool = True  # Standardize the input attributes.
+    use_cpu: bool = False  # Force use CPU.
+    lr: float = 1e-3  # Learning rate.
+    wd: float = 1e-4  # Weight decay.
+    mask_rate: float = 0.5  # Mask ratio.
+    replace_rate: float = 0.05  # Replacement rate.
+    alpha_l: int = 3  # Loss exponent parameter.
+    lam: float = 1.0  # Loss weighting parameter.
+    encoder: str = 'pcapass'  # Which encoder to use.
+    name: str = 'pcapassgnn'
+    path: str = 'methods/acc_and_pcapass/run_accgnn.py'
+    env_name: str = 'acc_neb_env'
+
+
+@dc.dataclass(frozen=True)
 class BgrlAlg(EmbeddingAlgSpec):
     graph_support: AlgGraphSupport = AlgGraphSupport(
         directed=True,
