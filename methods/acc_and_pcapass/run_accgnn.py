@@ -54,8 +54,8 @@ def compute_embeddings(input_file, output_path, as_undirected, weighted, node_at
         embeddings = embeddings.detach().cpu().numpy()
     meta_data = vars(args)
     meta_data["duration"] = duration
-    meta_data["start_loss"] = loss_history[0]
-    meta_data["end_loss"] = loss_history[-1]
+    meta_data["start_loss"] = loss_history[0] if loss_history else None
+    meta_data["end_loss"] = loss_history[-1] if loss_history else None
     np.save(output_path, embeddings, allow_pickle=False)
     if metadata_path is not None:
         with open(metadata_path, 'w') as fp:
