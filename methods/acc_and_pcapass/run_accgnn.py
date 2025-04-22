@@ -80,12 +80,6 @@ def main():
     if config['weighted']:
         raise NotImplementedError(f"Weighted graphs not implemented for {name}")
 
-    if config['edge_attributed']:
-        raise NotImplementedError(f"Edge attributes not implemented for {name}")
-
-    if config['dynamic']:
-        raise NotImplementedError(f"Dynamic graphs not supported for {name}")
-
     stf_cache_dir = f"/tmp/ssgnn_stf_cache/cpu_{args.cpu_workers}/"
     os.makedirs(stf_cache_dir, exist_ok=True)
     os.environ["NUMBA_CACHE_DIR"] = stf_cache_dir
