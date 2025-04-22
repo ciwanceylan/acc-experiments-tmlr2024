@@ -22,8 +22,14 @@ def _get_algs(method_set: str, emb_dim: int = None, num_epochs: int = None):
         methods = acc_nc_steps_and_dims()
     elif method_set == "sgcn_steps":
         methods = sgcn_steps()
-    elif method_set == "acc_vs_pcapass_k4_k10":
-        methods = acc_vs_pcapass_k4_k10(max_dim=emb_dim)
+    elif method_set == "acc_ga_steps":
+        methods = acc_ga_steps(max_dim=emb_dim)
+    elif method_set == "pcapass_ga_steps":
+        methods = pcapass_ga_steps(max_dim=emb_dim)
+    elif method_set == "acc_gnn_ga_steps":
+        methods = acc_gnn_ga_steps(max_dim=emb_dim)
+    elif method_set == "pcapass_gnn_ga_steps":
+        methods = pcapass_gnn_ga_steps(max_dim=emb_dim)
     elif method_set == "acc_pca_rtol_sweep":
         methods = acc_rtol_sweep(max_dim=emb_dim, num_steps=10)
     elif method_set == "acc_pca_rtol_sweep4":
@@ -41,12 +47,58 @@ def _get_algs(method_set: str, emb_dim: int = None, num_epochs: int = None):
     elif method_set == "acc_pcapass_sv_spectra":
         methods = acc_pcapass_sv_spectra(max_dim=emb_dim)
     elif method_set == "acc_pcapass_gnn_sv_spectra":
-        methods = acc_pcapass_gnn_sv_spectra(max_dim=emb_dim, num_epochs=num_epochs)
+        methods = acc_pcapass_gnn_sv_spectra(max_dim=emb_dim)
     else:
         methods = get_alg_by_name({method_set}, emb_dim=emb_dim, num_epochs=num_epochs)
         if len(methods) == 0:
             raise NotImplementedError(f"Method set {method_set} not implemented.")
 
+    return methods
+
+
+def acc_ga_steps(max_dim: int):
+    methods = []
+    for steps in [0, 1, 2, 3, 4, 6, 8, 10, 12]:
+        methods.append(
+            embalgs.AccAlg(
+                max_steps=steps, dimensions=max_dim
+            )
+        )
+    return methods
+
+
+def pcapass_ga_steps(max_dim: int):
+    methods = []
+    for steps in [0, 1, 2, 3, 4, 6, 8, 10, 12]:
+        methods.append(
+            embalgs.PcapassAlg(
+                max_steps=steps, dimensions=max_dim
+            )
+        )
+    return methods
+
+
+def acc_gnn_ga_steps(max_dim: int):
+    methods = []
+    for steps in [0, 1, 2, 3, 4, 6, 8, 10, 12]:
+        for num_epochs in [0, 20, 200]:
+            methods.append(
+                embalgs.AccgnnAlg(
+                    num_layers=steps, dimensions=max_dim, num_epochs=num_epochs
+                )
+            )
+    return methods
+
+
+def pcapass_gnn_ga_steps(max_dim: int):
+    methods = []
+    for steps in [0, 1, 2, 3, 4, 6, 8, 10, 12]:
+        for num_epochs in [0, 20, 200]:
+            methods.append(
+                embalgs.PcapassgnnAlg(
+                    num_layers=steps, dimensions=max_dim, num_epochs=num_epochs
+                )
+            )
     return methods
 
 
@@ -83,14 +135,14 @@ def sgcn_steps():
     return methods
 
 
-def acc_vs_pcapass_k4_k10(max_dim: int):
-    methods = [
-        embalgs.AccAlg(max_steps=4, dimensions=max_dim, name="acc4"),
-        embalgs.AccAlg(max_steps=10, dimensions=max_dim, name="acc10"),
-        embalgs.PcapassAlg(max_steps=4, dimensions=max_dim, name="pcapass4"),
-        embalgs.PcapassAlg(max_steps=10, dimensions=max_dim, name="pcapass10")
-    ]
-    return methods
+# def acc_vs_pcapass_k4_k10(max_dim: int):
+#     methods = [
+#         embalgs.AccAlg(max_steps=4, dimensions=max_dim, name="acc4"),
+#         embalgs.AccAlg(max_steps=10, dimensions=max_dim, name="acc10"),
+#         embalgs.PcapassAlg(max_steps=4, dimensions=max_dim, name="pcapass4"),
+#         embalgs.PcapassAlg(max_steps=10, dimensions=max_dim, name="pcapass10")
+#     ]
+#     return methods
 
 
 def acc_rtol_sweep(max_dim: int, num_steps: int):
@@ -154,23 +206,25 @@ def acc_pcapass_sv_spectra(max_dim: int):
         )
     return methods
 
-def acc_pcapass_gnn_sv_spectra(max_dim: int, num_epochs: int):
+
+def acc_pcapass_gnn_sv_spectra(max_dim: int):
     methods = []
     for steps in [0, 1, 2, 3, 4, 6, 8, 10]:
-        methods.append(
-            embalgs.PcapassgnnAlg(
-                dimensions=max_dim,
-                num_layers=steps,
-                num_epochs=num_epochs
+        for num_epochs in [0, 20, 200]:
+            methods.append(
+                embalgs.PcapassgnnAlg(
+                    dimensions=max_dim,
+                    num_layers=steps,
+                    num_epochs=num_epochs
+                )
             )
-        )
-        methods.append(
-            embalgs.AccgnnAlg(
-                dimensions=max_dim,
-                num_layers=steps,
-                num_epochs=num_epochs
+            methods.append(
+                embalgs.AccgnnAlg(
+                    dimensions=max_dim,
+                    num_layers=steps,
+                    num_epochs=num_epochs
+                )
             )
-        )
     return methods
 
 
