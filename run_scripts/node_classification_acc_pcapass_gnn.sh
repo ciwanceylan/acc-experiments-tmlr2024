@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 declare -a algs=("accgnn" "pcapassgnn")
-declare -a datasets=("chameleon" "squirrel" "roman_empire" "ogb_arxiv_year")
+declare -a datasets=("chameleon" "squirrel" "roman_empire" "arxiv_year")
 
 
 for a in "${algs[@]}"

@@ -3,7 +3,7 @@
 # "greet" is excluded from the algs list since it is very resource demanding
 # "spgcl" and "mvgrl" are excluded since their repos do not provide licenses
 declare -a algs=("node_attribute_only" "acc" "pcapass" "sgcn" "graphmae" "graphmae2" "graphmae2_gs" "bgrl" "bgrl_gs" "ccassg" "dgi" "gae")
-declare -a datasets=("chameleon" "squirrel" "roman_empire" "ogb_arxiv_year")
+declare -a datasets=("chameleon" "squirrel" "roman_empire" "arxiv_year")
 
 
 for a in "${algs[@]}"
