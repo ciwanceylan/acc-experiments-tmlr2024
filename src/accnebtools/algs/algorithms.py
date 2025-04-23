@@ -69,7 +69,7 @@ class AccgnnAlg(EmbeddingAlgSpec):
         node_attributed=True,
     )
     num_epochs: int = 20  # Number of training epochs
-    num_layers: int = 6  # Number of layers.
+    num_layers: int = 2  # Number of layers.
     dimensions: int = 512  # Embedding dimension.
     add_degree: bool = True  # Use the node degree features
     add_lcc: bool = True  # Use the local clustering coefficient features
@@ -95,7 +95,7 @@ class PcapassgnnAlg(EmbeddingAlgSpec):
         node_attributed=True,
     )
     num_epochs: int = 20  # Number of training epochs
-    num_layers: int = 6  # Number of layers.
+    num_layers: int = 2  # Number of layers.
     dimensions: int = 512  # Embedding dimension.
     add_degree: bool = True  # Use the node degree features
     add_lcc: bool = True  # Use the local clustering coefficient features
