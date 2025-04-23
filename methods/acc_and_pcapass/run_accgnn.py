@@ -16,6 +16,7 @@ import accnebtools.ssgnns.acc_pcapass_gnn.trainutils as trainutils
 def get_trainer(graph: dgraphs.SimpleGraph, args, use_cpu: bool):
     device = torch.device(f"cuda") if torch.cuda.is_available() and not use_cpu else torch.device('cpu')
     params = trainutils.Parameters(
+        max_emb_dim=args.dimensions,
         num_epochs=args.num_epochs,
         lr=args.lr,
         wd=args.wd,

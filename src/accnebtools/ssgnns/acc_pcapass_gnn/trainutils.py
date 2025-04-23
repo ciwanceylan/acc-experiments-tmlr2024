@@ -17,7 +17,7 @@ class Parameters:
     num_epochs: int = 1000
     lr: float = 0.001
     wd: float = 1e-4
-    max_emb_dim: int = 1024
+    max_emb_dim: int = 512
     num_layers: int = 6
     mask_rate: float = 0.5
     replace_rate: float = 0.05
