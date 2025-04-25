@@ -64,11 +64,16 @@ def main(args):
     cone_args = vars(args)
 
     start = time.time()
-    emb_matrixA = netmf(
-        adjA, dim=dim, window=args.window, b=args.negative, normalize=True)
+    same_emb_dims = False
+    while not same_emb_dims:
+        emb_matrixA = netmf(
+            adjA, dim=dim, window=args.window, b=args.negative, normalize=True)
 
-    emb_matrixB = netmf(
-        adjB, dim=dim, window=args.window, b=args.negative, normalize=True)
+        emb_matrixB = netmf(
+            adjB, dim=dim, window=args.window, b=args.negative, normalize=True)
+        same_emb_dims = emb_matrixA.shape[1] == emb_matrixB.shape[1]
+        dim = min(emb_matrixA.shape[1], emb_matrixB.shape[1])
+
     # step2 and 3: align embedding spaces and match nodes with similar embeddings
     alignment_matrix = align_embeddings(
         emb_matrixA,

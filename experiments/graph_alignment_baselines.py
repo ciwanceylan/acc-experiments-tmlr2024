@@ -74,9 +74,23 @@ def run_sgwl(adjA_path, adjB_path, output_file_name, metadata_file_name, tempdir
     return outcome, error_out
 
 
+def run_fugal(adjA_path, adjB_path, output_file_name, metadata_file_name, tempdir: str, timeout: int):
+    os.makedirs(tempdir, exist_ok=True)
+    method_dir = os.path.join(NEB_ROOT, 'methods/alignment_baselines/fugal')
+    run_command = [
+        "conda", "run", "-n", "acc_neb_env",
+        "python", f"{os.path.join(NEB_ROOT, method_dir, 'run_fugal.py')}",
+        f"{adjA_path}", f"{adjB_path}", f"{output_file_name}",
+        "--metadata_path", f"{metadata_file_name}",
+    ]
+    outcome, error_out = algutils.run_command(command=run_command, timeout_time=timeout, cwd=method_dir)
+    return outcome, error_out
+
+
 METHOD_DICT = {
     "conealign": run_conealign,
     "sgwl": run_sgwl,
+    "fugal": run_fugal
 }
 
 
@@ -122,10 +136,12 @@ def eval_alignment(methods, graphA: dgraphs.SimpleGraph, graphB: dgraphs.SimpleG
                     matching = None
                     metadata = None
 
-            accuracy = compute_alignment_accuracy(alignment_objective, matching)
             if matching is not None:
-                results.append({"method": method, "k@1": accuracy,
+                accuracy = compute_alignment_accuracy(alignment_objective, matching)
+                results.append({"method": method, "k@1": accuracy, "outcome": outcome,
                                 "duration": metadata["total_duration"]})
+            else:
+                results.append({"method": method, "outcome": outcome, "error": "\n".join(error_out)})
     return results
 
 
