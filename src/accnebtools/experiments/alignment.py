@@ -1,4 +1,4 @@
-from typing import Mapping
+from typing import Mapping, Literal
 import numpy as np
 import pandas as pd
 from numpy.random import Generator
@@ -149,3 +149,50 @@ def eval_k_nearest_per_node(pp_emb_generator: utils.PP_EMBS, alignment: AlignedG
                 continue
 
     return all_align_results
+
+
+def create_matching(similarity_mat: np.ndarray, matching_alg: Literal['nearest', 'sort_greedy']):
+    # neg_sim_mat = -1 * similarity_mat
+    match matching_alg:
+        case 'nearest':
+            matching = colmin(-1 * similarity_mat)
+        case 'sort_greedy':
+            matching = sort_greedy_voting(similarity_mat)
+        case _:
+            raise ValueError(f"Unknown matching algorithm '{matching_alg}'.")
+    return matching
+
+
+def colmin(matrix):
+    ma = np.arange(matrix.shape[0])
+    mb = matrix.argmin(1).flatten()
+    matching = np.stack((ma, mb), axis=1)
+    return matching
+
+
+def sort_greedy_voting(match_freq):
+    """ Taken from https://github.com/constantinosskitsas/Framework_GraphAlignment/blob/master/evaluation/matching.py """
+    dist_platt = np.ndarray.flatten(match_freq)
+    idx = np.argsort(dist_platt)  #
+    n = match_freq.shape[0]
+    k = idx // n
+    r = idx % n
+    idx_matr = np.c_[k, r]
+    G1_elements = set()
+    G2_elements = set()
+    i = n ** 2 - 1
+    j = 0
+    matching = np.ones([n, 2]) * (n + 1)
+    while (len(G1_elements) < n):
+        if (not idx_matr[i, 0] in G1_elements) and (not idx_matr[i, 1] in G2_elements):
+            matching[j, :] = idx_matr[i, :]
+
+            G1_elements.add(idx_matr[i, 0])
+            G2_elements.add(idx_matr[i, 1])
+            j += 1
+
+        i -= 1
+    matching = np.c_[matching[:, 0], matching[:, 1]]
+    matching = matching[matching[:, 0].argsort()]
+    matching.astype(int).T
+    return matching
