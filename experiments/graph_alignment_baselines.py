@@ -213,7 +213,7 @@ def main():
 
     experiment_name = f"{experiment_name}_{args.noise_p}/{args.matching_alg}"
 
-    results_path, resources, dataset_spec, args = common.setup_experiment(experiment_name, args)
+    results_path, dataset_spec, args = common.setup_experiment(experiment_name, args)
 
     results = run_eval(dataroot=args.dataroot, methods=args.methods,
                        dataset_spec=dataset_spec, noise_model=args.noisemodel, matching_alg=args.matching_alg,
