@@ -23,7 +23,10 @@ def feature_extraction(G, simple):
     # necessary data structures
     node_features = np.zeros(shape=(G.number_of_nodes(), 7))
     node_list = sorted(G.nodes())
-    node_degree_dict = dict(G.out_degree())
+    if isinstance(G, nx.DiGraph):
+        node_degree_dict = dict(G.out_degree())
+    else:
+        node_degree_dict = dict(G.degree())
     node_clustering_dict = dict(nx.clustering(G))
     egonets = {n: nx.ego_graph(G, n) for n in node_list}
 
