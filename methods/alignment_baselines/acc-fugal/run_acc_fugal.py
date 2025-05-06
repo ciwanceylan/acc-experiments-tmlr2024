@@ -89,8 +89,9 @@ def main(args):
     embeddings = torch.from_numpy(embeddings)
     F1 = embeddings[:adjA.shape[0], :]
     F2 = embeddings[adjA.shape[0]:, :]
-    Src = load_npz(args.adjA).astype(dtype).toarray()
-    Tar = load_npz(args.adjB).astype(dtype).toarray()
+
+    Src = adjA.astype(dtype).toarray()
+    Tar = adjB.astype(dtype).toarray()
 
     start = time.time()
     for i in range(Src.shape[0]):
