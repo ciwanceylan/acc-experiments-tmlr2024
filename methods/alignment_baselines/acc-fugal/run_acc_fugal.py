@@ -6,6 +6,7 @@ import torch
 import scipy.sparse as sp
 from scipy.sparse import load_npz
 from src.pred import eucledian_dist, convex_init
+from sklearn.decomposition import PCA
 
 import accmp.acc as acc
 import accmp.transforms as accmptrns
@@ -25,7 +26,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def compute_acc_embs(num_nodes, edges, K):
+def compute_acc_embs(num_nodes, edges, directed, K):
     dtype = np.float32
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
@@ -35,7 +36,7 @@ def compute_acc_embs(num_nodes, edges, K):
         use_lcc=True,
         use_weights=False,
         use_node_attributes=False,
-        as_undirected=False,
+        as_undirected=not directed,
         dtype=dtype
     )
     norm = None
@@ -64,7 +65,7 @@ def compute_acc_embs(num_nodes, edges, K):
     )
 
     embeddings = acc.agg_compress_cat_embeddings(
-        edge_index=edges.T, num_nodes=num_nodes, directed_conv=True, params=params, weights=None,
+        edge_index=edges.T, num_nodes=num_nodes, directed_conv=directed, params=params, weights=None,
         node_attributes=None, device=device, return_np=False)
     embeddings = embeddings.cpu()
     return embeddings
@@ -79,14 +80,16 @@ def main(args):
 
     adjA = load_npz(args.adjA)
     adjB = load_npz(args.adjB)
+    directed = (adjA != adjA.T).nnz > 0
     adj_comb = sp.block_diag((adjA, adjB))
     edges = np.stack((adj_comb.row, adj_comb.col), axis=1).astype(np.int64)
     num_nodes = adj_comb.shape[0]
 
-    embeddings = compute_acc_embs(edges=edges, num_nodes=num_nodes, K=args.K).to(torch.float64)
+    embeddings = compute_acc_embs(edges=edges, num_nodes=num_nodes, directed=directed, K=args.K).astype(dtype)
+    embeddings = PCA(whiten=True).fit_transform(embeddings)
+    embeddings = torch.from_numpy(embeddings)
     F1 = embeddings[:adjA.shape[0], :]
     F2 = embeddings[adjA.shape[0]:, :]
-
     Src = load_npz(args.adjA).astype(dtype).toarray()
     Tar = load_npz(args.adjB).astype(dtype).toarray()
 
@@ -103,14 +106,11 @@ def main(args):
         # If the sum of the row is zero, add a self-loop
         if row_sum == 0:
             Tar[i, i] = 1
-    n1 = Tar.shape[0]
-    n2 = Src.shape[0]
-    n = max(n1, n2)
 
     A = torch.from_numpy(Src).to(dtype=torch.float64)
     B = torch.from_numpy(Tar).to(dtype=torch.float64)
 
-    D = eucledian_dist(F1, F2, n)
+    D = eucledian_dist(F1, F2)
     D = torch.from_numpy(D).to(dtype=torch.float64)
 
     P = convex_init(A, B, D, mu, iter)

@@ -47,6 +47,8 @@ def main(args):
     Src = load_npz(args.adjA).astype(dtype).toarray()
     Tar = load_npz(args.adjB).astype(dtype).toarray()
 
+    directed = not np.allclose(Src, Src.T)
+
     start = time.time()
     for i in range(Src.shape[0]):
         row_sum1 = np.sum(Src[i, :])
@@ -63,26 +65,31 @@ def main(args):
     n1 = Tar.shape[0]
     n2 = Src.shape[0]
     n = max(n1, n2)
-    Src1 = nx.from_numpy_array(Src, create_using=nx.DiGraph)
-    Tar1 = nx.from_numpy_array(Tar, create_using=nx.DiGraph)
+
+    simple = True
+    if directed:
+        Src1 = nx.from_numpy_array(Src, create_using=nx.DiGraph)
+        Tar1 = nx.from_numpy_array(Tar, create_using=nx.DiGraph)
+        F1 = np.concatenate((
+            feature_extraction(Src1, simple),
+            feature_extraction(Src1.reverse(), simple)
+        ),
+            axis=1
+        )
+        F2 = np.concatenate((
+            feature_extraction(Tar1, simple),
+            feature_extraction(Tar1.reverse(), simple)
+        ),
+            axis=1
+        )
+    else:
+        Src1 = nx.from_numpy_array(Src, create_using=nx.Graph)
+        Tar1 = nx.from_numpy_array(Tar, create_using=nx.Graph)
+        F1 = feature_extraction(Src1, simple)
+        F2 = feature_extraction(Tar1, simple)
+
     A = torch.from_numpy(Src).to(dtype=torch.float64)
     B = torch.from_numpy(Tar).to(dtype=torch.float64)
-    simple = True
-    #
-    #
-
-    F1 = np.concatenate((
-        feature_extraction(Src1, simple),
-        feature_extraction(Src1.reverse(), simple)
-    ),
-        axis=1
-    )
-    F2 = np.concatenate((
-        feature_extraction(Tar1, simple),
-        feature_extraction(Tar1.reverse(), simple)
-    ),
-        axis=1
-    )
     D = eucledian_dist(F1, F2, n)
     D = torch.from_numpy(D).to(dtype=torch.float64)
 
