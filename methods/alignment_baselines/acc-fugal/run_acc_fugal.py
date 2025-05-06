@@ -66,8 +66,7 @@ def compute_acc_embs(num_nodes, edges, directed, K):
 
     embeddings = acc.agg_compress_cat_embeddings(
         edge_index=edges.T, num_nodes=num_nodes, directed_conv=directed, params=params, weights=None,
-        node_attributes=None, device=device, return_np=False)
-    embeddings = embeddings.cpu()
+        node_attributes=None, device=device, return_np=True)
     return embeddings
 
 
