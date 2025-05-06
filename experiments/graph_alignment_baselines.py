@@ -87,10 +87,24 @@ def run_fugal(adjA_path, adjB_path, output_file_name, metadata_file_name, tempdi
     return outcome, error_out
 
 
+def run_acc_fugal(adjA_path, adjB_path, output_file_name, metadata_file_name, tempdir: str, timeout: int):
+    os.makedirs(tempdir, exist_ok=True)
+    method_dir = os.path.join(NEB_ROOT, 'methods/alignment_baselines/acc-fugal')
+    run_command = [
+        "conda", "run", "-n", "acc_neb_env",
+        "python", f"{os.path.join(NEB_ROOT, method_dir, 'run_acc_fugal.py')}",
+        f"{adjA_path}", f"{adjB_path}", f"{output_file_name}",
+        "--metadata_path", f"{metadata_file_name}",
+    ]
+    outcome, error_out = algutils.run_command(command=run_command, timeout_time=timeout, cwd=method_dir)
+    return outcome, error_out
+
+
 METHOD_DICT = {
     "conealign": run_conealign,
     "sgwl": run_sgwl,
-    "fugal": run_fugal
+    "fugal": run_fugal,
+    "acc_fugal": run_acc_fugal
 }
 
 

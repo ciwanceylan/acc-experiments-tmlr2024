@@ -16,7 +16,7 @@ def parse_args():
     parser.add_argument('output_alignment', help='Output path for alignment matrix.')
     parser.add_argument('--metadata_path', nargs='?', help='Output path for metadata file.')
     parser.add_argument('--iter', default=15, type=int, help='Num iterations')
-    parser.add_argument('--mu', default=1, type=float, help='Num cpu threads')
+    parser.add_argument('--mu', default=1, type=float, help='Mu parameter')
 
     return parser.parse_args()
 
