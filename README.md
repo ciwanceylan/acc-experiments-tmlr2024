@@ -74,7 +74,7 @@ pip install -e .
 ```
 
 ### Install ACC
-Clone ACC from <URL> into a suitable location, and then install ACC using
+Clone ACC from [https://github.com/ciwanceylan/acc-mp](https://github.com/ciwanceylan/acc-mp) into a suitable location, and then install ACC using
 ```commandline
 pip install -e <path/to/ACC-repo>
 ```
